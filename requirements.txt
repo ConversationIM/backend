@@ -1,0 +1,7 @@
+flask-restful>=0.3.4,<0.4.0
+flask-socketio>=0.6.0,<0.7.0
+flask-sqlalchemy>=2.0,<=2.1
+
+### Useful extensions for the future
+# flask-user>=0.6.7,<0.7.0
+# flask-JWT>=0.2.0,<0.3.0
