@@ -16,6 +16,7 @@ socketio = SocketIO(app)
 
 def initialize():
     _initialize_logging()
+    _initialize_database()
     _initialize_resources()
 
     socketio.run(app)
@@ -25,6 +26,9 @@ def _initialize_logging():
 
     # TODO: add more specific configuration parameters
     logging.basicConfig(level=config.LOGGING_LEVEL)
+
+def _initialize_database():
+    database.create_all()
 
 def _initialize_resources():
     from app import users

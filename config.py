@@ -17,7 +17,7 @@ class _BaseConfig(object):
         # TODO: change once hosting environment is known
         mysql_parameters = {
             'username': os.getenv('MYSQL_USERNAME', 'root'),
-            'password': os.getenv('MYSQL_PASSWORD', 'root'),
+            'password': os.getenv('MYSQL_PASSWORD', ''),
             'host': os.getenv('MYSQL_HOST', 'localhost'),
             'port': os.getenv('MYSQL_PORT', 3306),
             'database': 'conversationIM'
