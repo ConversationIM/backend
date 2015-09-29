@@ -1,6 +1,9 @@
+--allow-external mysql-connector-python
+
 flask-restful>=0.3.4,<0.4.0
 flask-socketio>=0.6.0,<0.7.0
-flask-sqlalchemy>=2.0,<=2.1
+flask-sqlalchemy>=2.0,<=2.1,
+mysql-connector-python>=2.0.4,
 flask-user>=0.6.7,<0.7.0
 
 ### Useful extensions for the future

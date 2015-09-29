@@ -6,6 +6,10 @@ from flask_user.db_adapters import SQLAlchemyAdapter
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument('email', required=True, type=str)
+post_parser.add_argument('password', required=True, type=str)
+post_parser.add_argument('confirmedPassword', required=True, type=str)
+post_parser.add_argument('firstName', required=True, type=str)
+post_parser.add_argument('lastName', required=True, type=str)
 
 def init(app, api, database):
     user_manager = UserManager(SQLAlchemyAdapter(database,  model), app)
@@ -14,6 +18,12 @@ def init(app, api, database):
 
         def post(self):
             args = post_parser.parse_args()
+
+            # TODO: figure out how to properly throw errors
+            if (args.password != args.confirmedPassword):
+                raise "password and confirmedPassword"
+            if (user_manager.find_user_by_email(args.email)):
+                raise "email"
             return args
 
     api.add_resource(User, '/users')
