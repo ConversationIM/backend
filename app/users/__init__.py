@@ -1,5 +1,6 @@
 from app import api
 from app.users.models import User as model
+from flask import jsonify
 from flask_restful import Resource, reqparse
 from flask_user import UserManager
 from flask_user.db_adapters import SQLAlchemyAdapter
@@ -21,9 +22,16 @@ def init(app, api, database):
 
             # TODO: figure out how to properly throw errors
             if (args.password != args.confirmedPassword):
-                raise "password and confirmedPassword"
-            if (user_manager.find_user_by_email(args.email)):
-                raise "email"
-            return args
+                return jsonify({
+                    "error": "This would say that password and confirmedPassword are not equivalent"
+                })
+
+            existing_user = user_manager.find_user_by_email(args.email)
+            if (existing_user[0] is not None):
+                return jsonify({
+                    "error": "This would say that a user with that email already exists"
+                })
+
+            return jsonify({"result": "ok"})
 
     api.add_resource(User, '/users')
