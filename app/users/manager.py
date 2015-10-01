@@ -1,24 +1,25 @@
-import re
+import bcrypt
 
-from flask_user.db_adapters import SQLAlchemyAdapter
-from flask_user import UserManager as BaseManager
-from app.users.models import User
+from app.common import language
+from app.users.models import UserDao
 
-class UserManager(BaseManager):
+class UserManager(object):
 
-    def __init__(self, app, database):
-        database_adapter = SQLAlchemyAdapter(database,  User)
-        super(UserManager, self).__init__(database_adapter, app)
+    def __init__(self):
+        self.dao = UserDao()
 
-    def add_user(self, parameters):
-        # TODO: put this in a utilities module
-        creation_parameters = {}
-        for key, value in parameters.iteritems():
-            key = re.sub("([A-Z])", "_\g<1>", key).lower()
-            creation_parameters[key] = value
+    def _hash_password(self, password):
+        return bcrypt.hashpw(password, bcrypt.gensalt())
 
-        creation_parameters['password'] = self.hash_password(creation_parameters['password'])
-        del creation_parameters['confirmed_password']
+    def create(self, parameters):
+        parameters = language.pythonize_dict(parameters)
+        parameters['password'] = self._hash_password(parameters['password'])
+        del parameters['confirmed_password']
 
-        self.db_adapter.add_object(User, **creation_parameters)
-        self.db_adapter.commit()
+        return self.dao.create(**parameters)
+
+    def find_by_email(self, email):
+        return self.dao.find_by_email(email)
+
+    def password_matches(self, user, password):
+        return bcrypt.hashpw(password, user['password']) == user['password']

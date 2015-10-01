@@ -11,7 +11,7 @@ post_parser.add_argument('firstName', required=True, type=str)
 post_parser.add_argument('lastName', required=True, type=str)
 
 def init(app, api, database):
-    user_manager = UserManager(app, database)
+    user_manager = UserManager()
 
     class User(Resource):
 
@@ -24,13 +24,15 @@ def init(app, api, database):
                     "error": "This would say that password and confirmedPassword are not equivalent"
                 })
 
-            existing_user = user_manager.find_user_by_email(args.email)
-            if all(existing_user):
+            existing_user = user_manager.find_by_email(args.email)
+            print(existing_user)
+            if existing_user:
                 return jsonify({
                     "error": "This would say that a user with that email already exists"
                 })
 
             # TODO: marshal the data
-            user_manager.add_user(args)
+            res = user_manager.create(args)
+            return jsonify(res.to_dict())
 
     api.add_resource(User, '/users')

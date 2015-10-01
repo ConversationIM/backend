@@ -1,17 +1,23 @@
 from app import database as db
-from flask_user import UserMixin
+from app.common.dao import BaseDao
+from app.common.serializer import Serializable
 
-class User(db.Model, UserMixin):
+class User(db.Model, Serializable):
     __tablename__ = 'users'
+    __public__ = ['id', 'email', 'first_name', 'last_name', 'active']
 
     id = db.Column('ID', db.Integer, primary_key=True)
 
-    # required for Flask-User
     email = db.Column('Email', db.Unicode(255), nullable=False, unique=True)
     password = db.Column('Password', db.String(255), nullable=False)
-    active = db.Column('Is_Active', db.Boolean(), nullable=False, server_default='0')
-    confirmed_at = db.Column('Confirmed_At', db.DateTime())
-    reset_password_token = db.Column('Reset_Password_Token', db.String(100))
-
     first_name = db.Column('First_Name', db.Unicode(100), nullable=False)
     last_name = db.Column('Last_Name', db.Unicode(150), nullable=False)
+    active = db.Column('Is_Active', db.Boolean(), nullable=False, server_default='0')
+
+class UserDao(BaseDao):
+
+    def __init__(self):
+        super(UserDao, self).__init__(User)
+
+    def find_by_email(self, email):
+        return self.get_query_builder().filter_by(email=email).first()
