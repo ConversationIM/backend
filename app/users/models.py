@@ -1,5 +1,6 @@
 import re
 from app import database as db
+from app.common import exceptions
 from app.common.mixins import general, models
 from sqlalchemy.orm import validates
 
@@ -17,24 +18,27 @@ class User(db.Model, general.Serializable):
     last_name = db.Column('Last_Name', db.Unicode(150), nullable=False)
     active = db.Column('Is_Active', db.Boolean(), nullable=False, server_default='0')
 
-    @validates('Email')
+    @validates('email')
     def validate_email(self, key, value):
+        value = value.strip()
         if not re.match(_email_regex, value):
-            raise ValueError("Email format invalid")
-        if value.length > 255:
-            raise ValueError("Email cannot be longer than 255 characters")
+            raise exceptions.ValidationException("Email format invalid", key)
+        if len(value) > 255:
+            raise exceptions.ValidationException("Email cannot be longer than 255 characters", key)
         return value
     
-    @validates('First_Name')
+    @validates('first_name')
     def validate_first_name(self, key, value):
-        if value.length > 100 or value.length == 0:
-            raise ValueError("First name must be between 1 and 100 characters")
+        value = value.strip()
+        if len(value) > 100 or len(value) == 0:
+            raise exceptions.ValidationException("First name must be between 1 and 100 characters", key)
         return value
     
-    @validates('Last_Name')
+    @validates('last_name')
     def validate_first_name(self, key, value):
-        if value.length > 150 or value.length == 0:
-            raise ValueError('Last name must be between 1 and 150 characters')
+        value = value.strip()
+        if len(value) > 150 or len(value) == 0:
+            raise exceptions.ValidationException('Last name must be between 1 and 150 characters', key)
     
 
 class UserDao(models.BaseDao):

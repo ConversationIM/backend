@@ -1,4 +1,4 @@
-from app.common import utils, errors
+from app.common import utils, errors, exceptions
 from app.users.manager import UserManager
 from flask import request
 from flask_restful import Resource
@@ -12,9 +12,6 @@ arguments = {
 def init(app, api, database):
     # TODO: figure out a way to resolve circular imports that doesn't involve an init function
     # Then we can stop passing the app to the make_error/make_response functions too
-    #
-    # TODO: check format of arguments (i.e., is email actually an email? Is the input too long?)
-    # Not quite sure how to implement this cleanly
 
     user_manager = UserManager()
 
@@ -29,6 +26,7 @@ def init(app, api, database):
                 return marshal_error
 
             args = marshalled[0]
+            args['active'] = True
             if args.get('password') != args.get('confirmedPassword'):
                 message = "Confirmed password did not match password"
                 source = "confirmedPassword"
@@ -40,7 +38,12 @@ def init(app, api, database):
                 source = "email"
                 return utils.make_error(errors.InvalidParameterError(message, [source]))
 
-            user = user_manager.create(args)
+            user = None
+            try:
+                user = user_manager.create(args)
+            except exceptions.ValidationException, e:
+                return utils.make_validation_error(e)
+            
             return utils.make_response(data=user.to_dict())
 
     api.add_resource(User, '/users')

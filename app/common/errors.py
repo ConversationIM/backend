@@ -6,18 +6,14 @@ class _BaseError(general.Serializable):
 
     def __init__(self, type, message, status, code, source):
         if source and not isinstance(source, list):
-            raise TypeError("Error source must be a list")
+            source = [source]
 
         self.acknowledgable = True
         self.type = type
         self.message = message
         self.status = status
         self.code = code
-
-        if source is None:
-            self.source = []
-        else:
-            self.source = source
+        self.source = source
 
 class InvalidParameterError(_BaseError):
 

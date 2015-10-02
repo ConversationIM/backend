@@ -36,6 +36,14 @@ def make_error(errors):
     response.headers['Content-Type'] = 'application/json'
     return response
 
+def make_validation_error(validation_exception):
+    message = validation_exception.message
+    source = None
+    if validation_exception.field:
+        source = depythonize(validation_exception.field)
+    
+    return make_error(common.errors.InvalidParameterError(message, source))
+
 def make_marshal_error(marshal_result):
     error = None
     if marshal_result[1]:
