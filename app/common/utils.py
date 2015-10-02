@@ -3,6 +3,19 @@ from flask import make_response as respond
 from flask import json
 import inflection
 
+def byteify(input):
+    """
+    See http://stackoverflow.com/a/13105359/996249
+    """
+    if isinstance(input, dict):
+        return {byteify(key):byteify(value) for key,value in input.iteritems()}
+    elif isinstance(input, list):
+        return [byteify(element) for element in input]
+    elif isinstance(input, unicode):
+        return input.encode('utf-8')
+    else:
+        return input
+
 def make_response(data):
     response = { "meta": { 'status': 200 }, "data": data }
 
@@ -33,7 +46,7 @@ def make_marshal_error(marshal_result):
     return error
 
 def marshal_request(arguments, expected):
-    arguments = json.loads(arguments)
+    arguments = byteify(json.loads(arguments))
     required = expected.get('required', [])
     allowed = expected.get('allowed', [])
 
