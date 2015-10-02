@@ -1,6 +1,6 @@
 import bcrypt
 
-from app.common import language
+from app.common import utils
 from app.users.models import UserDao
 
 class UserManager(object):
@@ -12,7 +12,7 @@ class UserManager(object):
         return bcrypt.hashpw(password, bcrypt.gensalt())
 
     def create(self, parameters):
-        parameters = language.pythonize_dict(parameters)
+        parameters = utils.pythonize_dict(parameters)
         parameters['password'] = self._hash_password(parameters['password'])
         del parameters['confirmed_password']
 

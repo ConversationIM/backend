@@ -1,8 +1,7 @@
 from app import database as db
-from app.common.dao import BaseDao
-from app.common.serializer import Serializable
+from app.common.mixins import general, models
 
-class User(db.Model, Serializable):
+class User(db.Model, general.Serializable):
     __tablename__ = 'users'
     __public__ = ['id', 'email', 'first_name', 'last_name', 'active']
 
@@ -14,7 +13,7 @@ class User(db.Model, Serializable):
     last_name = db.Column('Last_Name', db.Unicode(150), nullable=False)
     active = db.Column('Is_Active', db.Boolean(), nullable=False, server_default='0')
 
-class UserDao(BaseDao):
+class UserDao(models.BaseDao):
 
     def __init__(self):
         super(UserDao, self).__init__(User)
