@@ -47,6 +47,23 @@ A file containing all required dependencies is contained in the `project` direct
 pip install -r requirements.txt
 ```
 
+#### A Note on MySQL
+
+You will need a local MySQL server running in order to persist resources. Depending on your system, connecting to this server via our API may be a bit of a hassle.
+
+For Mac users, this [StackOverflow thread](http://stackoverflow.com/a/25491082/996249) lists the steps for installing MySQL so that it will work with the connector that we use (MySQL-Python). For Windows/Linux users, issues will have to be resolved on a case-by-case basis.
+
+## Configuration
+
+The following environment variables can be used to configure the API for your system:
+
+| Variable | Possible Values | Purpose |
+| -------- | --------------- | ------- |
+| MYSQL_USERNAME | Any string | Overrides default MySQL username ('root') |
+| MYSQL_PASSWORD | Any string | Overrides default MySQL password ('') |
+| MYSQL_HOST | Any valid URI | Overrides default MySQL host ('localhost') |
+| MYSQL_PORT | Any valid port number | Overrides default MySQL port (3306) |
+
 ## Starting Up
 
 With your virtualenv active, change directory so that you are in the `project` directory, and run the following:

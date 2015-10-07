@@ -6,8 +6,5 @@ MySQL-python>=1.2.5,
 bcrypt>=2.0.0
 inflection>=0.3.1
 
-# having trouble installing mysql-python?
-# be sure you've followed the steps here: http://stackoverflow.com/a/25491082/996249
-
 ### Useful extensions for the future
 # flask-JWT>=0.2.0,<0.3.0

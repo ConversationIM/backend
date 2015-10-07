@@ -18,14 +18,16 @@ api = Api(app, '/v1')
 database = SQLAlchemy(app)
 socketio = SocketIO(app)
 
-from app.users import User
-api.add_resource(User, '/users')
-
 def initialize():
     _initialize_logging()
+    _initialize_resources()
 
     socketio.run(app)
 
 def _initialize_logging():
     # TODO: add more specific configuration parameters
     logging.basicConfig(level=config.LOGGING_LEVEL)
+    
+def _initialize_resources():
+    from app.users import User
+    api.add_resource(User, '/users')
