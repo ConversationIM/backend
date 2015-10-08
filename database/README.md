@@ -24,7 +24,7 @@ Naturally, if you have a package manager on your system, you can install flyway 
 
 ## Schema Setup
 
-You will need a schema called `ConversationIM` present on your MySQL server in order for anything to work.
+You will need a schema called `conversationIM` present on your MySQL server in order for anything to work.
 
 #### MySQL Visual Database Tools
 
@@ -32,14 +32,14 @@ If you do not have one already, you should find a visual database tool for MySQL
 
 #### Adding the Schema
 
-Regardless of whether you or not you have installed a visual database tool, you must add the schema named above. Keep in mind that the name is case-sensitive, so creating `Conversationim` or `conversationIM` will cause you to see plenty of errors later on.
+Regardless of whether you or not you have installed a visual database tool, you must add the schema named above. Keep in mind that the name is case-sensitive, so creating `Conversationim` or `ConversationIM` will cause you to see plenty of errors later on.
 
 ## Running the Migrations
 
 Once you have everything set up, you can keep your database in-sync very easily. Make sure that you have set the database-related environment variables described in the primary README, and then run the following command:
 
 ```
-flyway.sh migrate
+sh flyway.sh migrate
 ```
 
 You should see Flyway run through all of the existing migrations, applying each chronologically. If an error occurs, you will see details as to what went wrong.
@@ -57,9 +57,9 @@ For example, a migration that creates a new table called `foo` on 7/15/2015 at 1
 
 > 20151507\_1200__createFooModel.sql
 
-Since this is especially painful to type for every migration, use the shell script called `migration.sh` to generate this file name. To generate the above migration file name, run:
+Since this is especially painful to type for every migration, use the shell script called `timestamp.sh` to generate this file name. To generate the above migration file name, run:
 
-> migration.sh createFooModel
+> sh timestamp.sh createFooModel
 
 #### Reverts
 Although FlywayDB does not have the ability to revert migrations for us, having a quick way to revert a previous migration may be useful in production hotfixes. The naming convention is exactly the same as that which is above, but should be placed in the `revert` folder, and have a `.revert.sql` ending:

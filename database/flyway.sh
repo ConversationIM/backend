@@ -2,7 +2,9 @@ USER=${MYSQL_USERNAME:='root'}
 PASSWORD=${MYSQL_PASSWORD:=''}
 HOST=${MYSQL_HOST:='localhost'}
 PORT=${MYSQL_PORT:='3306'}
-SCHEMA='ConversationIM'
+SCHEMA='conversationIM'
+
+SCRIPT_DIR=$(dirname $0)
 
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <flyway command>"
@@ -10,4 +12,4 @@ if [ "$#" -ne 1 ]; then
     exit 2
 fi
 
-flyway -user=$USER -password=$PASSWORD  -url=jdbc:mysql://$HOST:$PORT/$SCHEMA -locations=filesystem:${PWD}/migration -baselineOnMigrate=true -sqlMigrationSuffix=.sql $1
+flyway -user=$USER -password=$PASSWORD  -url=jdbc:mysql://$HOST:$PORT/$SCHEMA -locations=filesystem:$SCRIPT_DIR/migration -baselineOnMigrate=true -sqlMigrationSuffix=.sql $1
