@@ -47,11 +47,9 @@ A file containing all required dependencies is contained in the `project` direct
 pip install -r requirements.txt
 ```
 
-#### A Note on MySQL
+#### Database
 
-You will need a local MySQL server running in order to persist resources. Depending on your system, connecting to this server via our API may be a bit of a hassle.
-
-For Mac users, this [StackOverflow thread](http://stackoverflow.com/a/25491082/996249) lists the steps for installing MySQL so that it will work with the connector that we use (MySQL-Python). For Windows/Linux users, issues will have to be resolved on a case-by-case basis.
+All database-related setup is described in the [migration README](/atabase/README.md). Please refer to it for details on how to get your a local database instance running that can accommodate our API.
 
 ## Configuration
 
