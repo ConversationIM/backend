@@ -67,7 +67,7 @@ Although FlywayDB does not have the ability to revert migrations for us, having 
 
 You can typically just use the same output from the `migration.sh` script to name your revert, taking care to add the `.revert.sql` filename ending.
 
-### Table and Column Naming
+#### Table and Column Naming
 Let's have tables always represent the data that they hold collectively, that is, as a lowercase plural entity. For example, always make a table like `foos`, not like `foo` or `Foo`.
 
 Column names should be somewhat of the opposite, just to make sure that we don't accidentally mix up column names and table names. Let's represent column
@@ -75,7 +75,7 @@ names like `Bar` or `Bar_Baz`, but not `bar` or `bar_baz`.
 
 In any case, make sure to exchange places where spaces would normally be inserted with underscores.
 
-### Cascading ON UPDATE/DELETE
+#### Cascading ON UPDATE/DELETE
 As a reference, please read the marked answer to this [StackOverflow response](http://stackoverflow.com/questions/6720050/foreign-key-varraints-when-to-use-on-update-and-on-delete).
 
 Overall, it's saying that you usually (but not always) want to cascade ON UPDATE. However, for ON DELETE operations, you need to really think. For
