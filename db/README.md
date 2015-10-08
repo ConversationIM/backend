@@ -1,4 +1,4 @@
-# ConversationIM Database Migrations
+# ConversationIM Database
 
 The migration scripts and tools supporting ConversationIM are stored here.
 
