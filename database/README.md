@@ -36,7 +36,7 @@ Regardless of whether you or not you have installed a visual database tool, you 
 
 ## Running the Migrations
 
-Once you have everything set up, you can keep your database in-sync very easily. Make sure that you have set the database-related environment variables [described in the primary README](/../README.md#Configuration), and then run the following command:
+Once you have everything set up, you can keep your database in-sync very easily. Make sure that you have set the database-related environment variables described in the primary README, and then run the following command:
 
 ```
 sh flyway.sh migrate
