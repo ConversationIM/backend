@@ -49,7 +49,7 @@ pip install -r requirements.txt
 
 #### Database
 
-All database-related setup is described in the [migration README](/database/README.md). Please refer to it for details on how to get your a local database instance running that can accommodate our API.
+All database-related setup is described in the [migration README](/db/README.md). Please refer to it for details on how to get your a local database instance running that can accommodate our API.
 
 ## Configuration
 
