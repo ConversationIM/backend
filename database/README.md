@@ -44,7 +44,7 @@ flyway.sh migrate
 
 You should see Flyway run through all of the existing migrations, applying each chronologically. If an error occurs, you will see details as to what went wrong.
 
-## Migrations & Reverts
+## New Migrations & Reverts
 
 Since we are using the FlywayDB command-line tool, you can typically just copy-and-paste whatever SQL you used to perform your migrations locally into a migration script file. There are some things to keep in mind, however.
 
