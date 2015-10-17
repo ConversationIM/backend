@@ -1,5 +1,5 @@
 from app.common import utils, errors, exceptions
-from app.users.manager import UserManager
+from app.users.service import UserService
 from flask import request
 from flask_restful import Resource
 
@@ -9,7 +9,7 @@ arguments = {
     }
 }
 
-user_manager = UserManager()
+user_service = UserService()
 
 class User(Resource):
 
@@ -28,7 +28,7 @@ class User(Resource):
             source = "confirmedPassword"
             return utils.make_error(errors.InvalidParameterError(message, [source]))
 
-        existing_user = user_manager.find_by_email(args.get('email'))
+        existing_user = user_service.find_by_email(args.get('email'))
         if existing_user:
             message = "The user " + args.get('email') + " already exists"
             source = "email"
@@ -36,7 +36,7 @@ class User(Resource):
 
         user = None
         try:
-            user = user_manager.create(args)
+            user = user_service.create(args)
         except exceptions.ValidationException, e:
             return utils.make_validation_error(e)
         

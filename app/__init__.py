@@ -31,3 +31,5 @@ def _initialize_logging():
 def _initialize_resources():
     from app.users import User
     api.add_resource(User, '/users')
+    from app.auth import BasicAuth
+    api.add_resource(BasicAuth, '/auth')

@@ -1,7 +1,7 @@
 class ValidationException(Exception):
     """
     An exception indicating that an error 
-    occurred during validation. 
+    occurred during model validation. 
     """
     
     def __init__(self, message, field):
@@ -12,3 +12,12 @@ class ValidationException(Exception):
         
         self.field = field
         super(ValidationException, self).__init__(message)
+
+class TokenValidationException(Exception):
+	"""
+	An exception indicating that an error
+	occurred during token validation.
+	"""
+
+	def __init__(self, message):
+		super(TokenValidationException, self).__init__(message)
