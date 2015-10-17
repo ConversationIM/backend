@@ -1,5 +1,5 @@
 from functools import wraps
-frmo flask import request, Response
+from flask import request, Response
 
 def check_auth(username, password):
  // Check if a username /password combination is valid
