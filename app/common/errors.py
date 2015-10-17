@@ -59,6 +59,22 @@ class MissingParameterError(_BaseError):
 
         super(MissingParameterError, self).__init__(type, message, status, code, source)
 
+class InvalidHeaderError(_BaseError):
+    """
+    An error indicating that the client provided one or more
+    headers that were invalid
+    """
+
+    def __init__(self, message, source):
+        type = 'InvalidHeaderError'
+        if not message:
+            message = 'One or more headers were missing from the request'
+        status = 400
+        code = 103
+
+        super(InvalidHeaderError, self).__init__(type, message, status, code, source)
+
+
 class ApiError(_BaseError):
     """
     An error indicating that something went wrong, but the exact

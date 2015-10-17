@@ -3,7 +3,7 @@ import bcrypt
 from app.common import utils
 from app.users.models import UserDao
 
-class UserManager(object):
+class UserService(object):
     """
     Handles operations related to the management of User
     instances
@@ -47,5 +47,6 @@ class UserManager(object):
         :user a user instance
         :password a password to check against
         """
-        
-        return bcrypt.hashpw(password, user['password']) == user['password']
+        password = utils.byteify(password)
+        print(password)
+        return bcrypt.hashpw(password, user.password) == user.password
