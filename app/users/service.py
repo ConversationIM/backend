@@ -17,7 +17,7 @@ class UserService(object):
         Hashes the provided password using bcrypt
         :password the password to hash
         """
-        
+
         return bcrypt.hashpw(password, bcrypt.gensalt())
 
     def create(self, parameters):
@@ -26,7 +26,7 @@ class UserService(object):
         :parameters the parameters to use to create the user, which
         must be declared in the User model
         """
-        
+
         parameters = utils.pythonize_dict(parameters)
         parameters['password'] = self._hash_password(parameters['password'])
         del parameters['confirmed_password']
@@ -38,7 +38,7 @@ class UserService(object):
         Finds a user by the provided email by invoking the User DAO
         :email the email address to query with
         """
-        
+
         return self.dao.find_by_email(email)
 
     def password_matches(self, user, password):
@@ -47,6 +47,6 @@ class UserService(object):
         :user a user instance
         :password a password to check against
         """
-        password = utils.byteify(password)
-        print(password)
-        return bcrypt.hashpw(password, user.password) == user.password
+
+        existing_hash = utils.byteify(user.password)
+        return bcrypt.hashpw(password, existing_hash) == existing_hash

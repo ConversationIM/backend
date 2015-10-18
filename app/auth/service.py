@@ -16,21 +16,20 @@ class AuthService(object):
 
 	def make_token(self, user):
 		payload = {
-				'sub': user.id, 
+				'sub': user.id,
 				'email': user.email,
-				'exp': datetime.datetime.utcnow() + datetime.timedelta(days = _params['EXPIRATION_IN_DAYS'])
+				'exp': datetime.datetime.utcnow() + datetime.timedelta(days = self._params['EXPIRATION_IN_DAYS'])
 			}
 
 
-		return jwt.encode(payload, _secret, algorithms = [_params['ALGORITHM']])
+		return jwt.encode(payload, self._secret, algorithm=self._params['ALGORITHM'])
 
 	def validate_token(self, token):
 		try:
-			payload = jwt.decode(token)
+			payload = jwt.decode(token, algorithms=[self._params['ALGORITHM']])
 		except jwt.DecodeError:
 			message = 'The provided token is invalid'
 			raise exceptions.TokenValidationExeception(message)
 		except jwt.InvalidTokenError:
 			message = 'The provided token could not be decoded'
 			raise exceptions.TokenValidationExeception(message)
-			
