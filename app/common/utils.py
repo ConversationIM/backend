@@ -24,7 +24,7 @@ def make_response(data):
     and returns it to the caller
     :data the data to include in the response
     """
-    
+
     response = { "meta": { 'status': 200 }, "data": data }
 
     response = respond((json.dumps(response), 200))
@@ -38,7 +38,7 @@ def make_error(errors):
     The response object is returned to the caller
     :errors a single error or list of errors
     """
-    
+
     error_list = []
     if type(errors) is not list:
         errors = [errors]
@@ -58,12 +58,12 @@ def make_validation_error(validation_exception):
     to the caller
     :validation_exception an exception of type ValidationException
     """
-    
+
     message = validation_exception.message
     source = None
     if validation_exception.field:
         source = depythonize(validation_exception.field)
-    
+
     return make_error(common.errors.InvalidParameterError(message, source))
 
 def make_marshal_error(marshal_result):
@@ -73,7 +73,7 @@ def make_marshal_error(marshal_result):
     If no error message is present, then None is returned to the caller
     :marshal_result the tuple returned by marshal_request
     """
-    
+
     error = None
     if marshal_result[1]:
         message = None
@@ -91,7 +91,7 @@ def marshal_request(arguments, expected):
     :arguments the request data received by the API
     :expected the dictionary containing the allowed and required parameters
     """
-    
+
     arguments = byteify(json.loads(arguments))
     required = expected.get('required', [])
     allowed = expected.get('allowed', [])
@@ -109,14 +109,14 @@ def pythonize(word):
     Returns a word in underscore-form
     For example: someKey -> some_key
     """
-    
+
     return inflection.underscore(word)
 
 def pythonize_dict(dictionary):
     """
     Returns a new dictionary in which all keys have been pythonized
     """
-    
+
     new_dictionary = {}
     for key, value in dictionary.iteritems():
         key = inflection.underscore(key)
@@ -129,14 +129,14 @@ def depythonize(word):
     Returns a word in camelized form
     For example: some_key -> someKey
     """
-    
+
     return inflection.camelize(word, False)
 
 def depythonize_dict(dictionary):
     """
     Returns a new dictionary in which all keys have been depythonized
     """
-    
+
     new_dictionary = {}
     for key, value in dictionary.iteritems():
         key = inflection.camelize(key, False)

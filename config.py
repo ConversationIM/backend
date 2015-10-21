@@ -7,14 +7,14 @@ class ConfigFactory(object):
     """
     Generates the configuration for the current environment
     """
-    
+
     @staticmethod
     def build_config():
         """
         Based on whether or not an environment-specific variable or
         variables is/are present, chooses the appropriate configuration
         """
-        
+
         # TODO: change once hosting environment is known
         if os.getenv('ON_PRODUCTION') is not None:
             return _ProductionConfig()
@@ -25,7 +25,7 @@ class _BaseConfig(object):
     """
     The configuration keys common to all config types
     """
-    
+
     def _build_sql_uri():
         # TODO: change once hosting environment is known
         mysql_parameters = {
@@ -44,13 +44,17 @@ class _BaseConfig(object):
     SECRET_KEY = os.getenv('CONVERSATIONIM_API_SECRET', 'https://open.spotify.com/track/64i1dyG9Td5z5Q0TCG17Pb')
     LOGGING_LEVEL = NOTSET
     SQLALCHEMY_DATABASE_URI = _build_sql_uri()
+    JWT_PARAMS = {
+		'ALGORITHM' : 'HS256',
+		'EXPIRATION_IN_DAYS': 7
+        }
 
 class _DevelopmentConfig(_BaseConfig):
     """
-    The configuration keys and their corresponding settings 
+    The configuration keys and their corresponding settings
     for a development environment
     """
-    
+
     DEBUG = True
     TESTING = True
     LOGGING_LEVEL = INFO
@@ -60,5 +64,5 @@ class _ProductionConfig(_BaseConfig):
     The configuraiton keys and their corresponding settings
     for a production environment
     """
-    
+
     LOGGING_LEVEL = ERROR
