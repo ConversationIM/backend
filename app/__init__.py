@@ -21,6 +21,7 @@ socketio = SocketIO(app)
 def initialize():
     _initialize_logging()
     _initialize_resources()
+    _initialize_socketio()
 
     socketio.run(app)
 
@@ -33,3 +34,7 @@ def _initialize_resources():
     api.add_resource(User, '/users')
     from app.auth import BasicAuth
     api.add_resource(BasicAuth, '/auth')
+    
+def _initialize_socketio():
+    from app.sockets import SocketSetupService
+    SocketSetupService.setup_handlers(socketio)

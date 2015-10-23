@@ -68,9 +68,24 @@ class InvalidHeaderError(_BaseError):
     def __init__(self, message, source):
         type = 'InvalidHeaderError'
         if not message:
-            message = 'One or more headers were missing from the request'
+            message = 'One or more headers in the request were invalid'
         status = 400
         code = 103
+
+        super(InvalidHeaderError, self).__init__(type, message, status, code, source)
+        
+class MissingHeaderError(_BaseError):
+    """
+    An error indicating that the client did not provide one or
+    more required headers
+    """
+
+    def __init__(self, message, source):
+        type = 'MissingHeaderError'
+        if not message:
+            message = 'One or more headers were missing from the request'
+        status = 400
+        code = 104
 
         super(InvalidHeaderError, self).__init__(type, message, status, code, source)
 
