@@ -23,7 +23,7 @@ def authenticated_request(f):
         payload = None
         try:
             payload = auth_service.validate_token(auth_token)
-        except exceptions.TokenValidationExeception, e:
+        except exceptions.TokenValidationException, e:
             message = e.message
             source = auth_service.AUTH_HEADER_KEY
             return utils.make_error(errors.InvalidParameterError(message, source))
@@ -35,26 +35,24 @@ def authenticated_request(f):
 def authenticated_event(f):
     @functools.wraps(f)
     def wrapped(*args, **kwargs):
-        auth_service = AuthService()
-        
-        data = args['data']
+        data = args[0] if len(args) else None
         auth_token = None
         if data:
             data = loads(data)
-            auth_token = data['token']
+            auth_token = data.get('token')
             kwargs['data'] = data
             
         if not auth_token:
             message = "This resource cannot be accessed without a valid authentication token"
             kwargs['error'] = message
-        
-        payload = None
-        try:
-            payload = auth_service.validate_token(auth_token)
-            kwargs['user'] = payload
-        except exceptions.TokenValidationExeception, e:
-            message = e.message
-            kwargs['error'] = message
+        else:
+            auth_service = AuthService()
+            try:
+                payload = auth_service.validate_token(auth_token)
+                kwargs['user'] = payload
+            except exceptions.TokenValidationException, e:
+                message = e.message
+                kwargs['error'] = message
         
         return f(*args, **kwargs)
     return wrapped

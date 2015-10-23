@@ -31,11 +31,11 @@ class AuthService(object):
 
 	def validate_token(self, token):
 		try:
-			payload = jwt.decode(token, algorithms=[self._params['ALGORITHM']])
+			payload = jwt.decode(token, self._secret, algorithms=[self._params['ALGORITHM']])
 			return payload
 		except jwt.DecodeError:
 			message = 'The provided token was invalid'
-			raise exceptions.TokenValidationExeception(message)
+			raise exceptions.TokenValidationException(message)
 		except jwt.InvalidTokenError:
 			message = 'The provided token could not be decoded'
-			raise exceptions.TokenValidationExeception(message)
+			raise exceptions.TokenValidationException(message)

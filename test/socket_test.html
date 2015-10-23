@@ -4,6 +4,10 @@
     html {
       margin: 20px;
     }
+    p {
+      margin-top: 0px;
+      margin-bottom: 0px;
+    }
   </style>
 </head>
 <body>
@@ -21,10 +25,19 @@
   			}
   		}, 3000);
   		
-	    var socket = io.connect("http://localhost:5000");
+	    var socket = io.connect("http://localhost:5000/mvp");
 	        socket.on('connect', function() {
-	        	statusElement.innerHTML = 'Connected';
+	        	statusElement.innerHTML = "<p> - Connected to SocketIO namespace 'MVP'</p>";
 	        });
+	        socket.on('error', function(error) {
+	        	statusElement.innerHTML += "<p style='color:red'> - Error: " + error + "</p>";
+	        });
+	        socket.on('joined', function(data) {
+	        	statusElement.innerHTML += "<p> - Joined room '" + data['room'] + "'</p>"
+	        });
+	        
+	        var token = "test_token_here";
+	        socket.emit('join', JSON.stringify({'token': token, 'room': 'default'}));
 	} catch (e) {
 		statusElement.innerHTML = e;
 	}
