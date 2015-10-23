@@ -5,6 +5,9 @@ from app.auth.decorators import authenticated_event
 class SocketSetupService(object):
     """
     Handles all operations related to socketio handler setup
+    Note: this is to be used in its current state for the MVP
+    ONLY. The functionality has not been throughly tested enough
+    to leave it as-is
     """
  
     @staticmethod
@@ -25,7 +28,15 @@ class SocketSetupService(object):
             join_room(requested_room)
             emit('joined', {'room': requested_room})
  
-        @socketio.on('sent')
-        def handle_send(json):
+        @socketio.on('updated', namespace="/mvp")
+        def handle_update(json):
             data = loads(json)
-            emit('sent', data, broadcast=True)
+            data = {"message": data.get('message'), "sender": data.get("sender")}
+            emit('updated', data, room=data.get("room"), broadcast=True)
+            
+        @socketio.on('sent', namespace="/mvp")
+        def handle_send(json):
+            #violating DRY in order to get the MVP done faster
+            data = loads(json)
+            data = {"message": data.get('message'), "sender": data.get("sender")}
+            emit('sent', data, room=data.get("room"), broadcast=True)
