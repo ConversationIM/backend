@@ -44,6 +44,7 @@ class _BaseConfig(object):
     SECRET_KEY = os.getenv('CONVERSATIONIM_API_SECRET', 'https://open.spotify.com/track/64i1dyG9Td5z5Q0TCG17Pb')
     LOGGING_LEVEL = NOTSET
     SQLALCHEMY_DATABASE_URI = _build_sql_uri()
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_PARAMS = {
 		'ALGORITHM' : 'HS256',
 		'EXPIRATION_IN_DAYS': 7
