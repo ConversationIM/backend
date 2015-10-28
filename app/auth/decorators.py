@@ -17,7 +17,7 @@ def authenticated_request(f):
         if not auth_token:
             message = "This resource cannot be accessed without a valid authentication token"
             source = auth_service.AUTH_HEADER_KEY
-            return utils.make_error(errors.MissingHeaderError(message, source))
+            return utils.make_error(errors.UnauthenticatedRequestError(message, source))
         
         payload = None
         try:
@@ -25,7 +25,7 @@ def authenticated_request(f):
         except exceptions.TokenValidationException, e:
             message = e.message
             source = auth_service.AUTH_HEADER_KEY
-            return utils.make_error(errors.InvalidHeaderError(message, source))
+            return utils.make_error(errors.UnauthenticatedRequestError(message, source))
         
         kwargs['user'] = payload
         return f(*args, **kwargs)

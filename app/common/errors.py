@@ -89,6 +89,21 @@ class MissingHeaderError(_BaseError):
 
         super(MissingHeaderError, self).__init__(type, message, status, code, source)
 
+class UnauthenticatedRequestError(_BaseError):
+    """
+    An error indicating that the client provided a request
+    that could not be authenticated
+    """
+
+    def __init__(self, message, source):
+        type = 'UnauthenticatedRequestError'
+        if not message:
+            message = 'This resource cannot be accessed with the provided credentials'
+        status = 404
+        code = 106
+
+        super(UnauthenticatedRequestError, self).__init__(type, message, status, code, source)
+
 
 class ApiError(_BaseError):
     """
@@ -116,6 +131,6 @@ class NotFoundError(_BaseError):
         if not message:
             message = 'The requested resource could not be found'
         status = 404
-        code = 106
+        code = 105
 
         super(NotFoundError, self).__init__(type, message, status, code, source)
