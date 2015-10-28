@@ -60,6 +60,23 @@ class _DevelopmentConfig(_BaseConfig):
     TESTING = True
     LOGGING_LEVEL = INFO
 
+class _StagingConfig(_BaseConfig):
+    """
+    The configuration keys and their corresponding settings
+    for a staging environment
+    """
+
+    def _build_sql_uri():
+        mysql_parameters = {
+            'connection': os.getenv('OPENSHIFT_MYSQL_DB_URL'),
+            'database': 'staging'
+        }
+
+        return '{connection}{database}'.format(**mysql_parameters)
+
+    SQLALCHEMY_DATABASE_URI = _build_sql_uri()
+    LOGGING_LEVEL = INFO
+
 class _ProductionConfig(_BaseConfig):
     """
     The configuraiton keys and their corresponding settings
