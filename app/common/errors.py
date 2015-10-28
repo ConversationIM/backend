@@ -87,7 +87,7 @@ class MissingHeaderError(_BaseError):
         status = 400
         code = 104
 
-        super(InvalidHeaderError, self).__init__(type, message, status, code, source)
+        super(MissingHeaderError, self).__init__(type, message, status, code, source)
 
 
 class ApiError(_BaseError):
@@ -105,33 +105,17 @@ class ApiError(_BaseError):
 
         super(ApiError, self).__init__(type, message, status, code, None)
 
-
-class UnauthenticatedRequestError(_BaseError):
+class NotFoundError(_BaseError):
     """
-    An error indicating that the client did not provide a request
-    that could not be authenticated
-    """
-
-    def __init__(self, message, source):
-        type = 'UnauthenticatedRequestError'
-        if not message:
-            message = 'An authentication error has occurred'
-        status = 404
-        code = 105
-
-        super(InvalidHeaderError, self).__init__(type, message, status, code, source)
-
-class MissingUserError(_BaseError):
-    """
-    An error indicating that the client did not provide a valid 
-    user that could be found
+    An error indicating that the requested resource could
+    not be found
     """
 
     def __init__(self, message, source):
         type = 'MissingUserError'
         if not message:
-            message = 'The provided user could not be found'
+            message = 'The requested resource could not be found'
         status = 404
         code = 106
 
-        super(InvalidHeaderError, self).__init__(type, message, status, code, source)
+        super(NotFoundError, self).__init__(type, message, status, code, source)

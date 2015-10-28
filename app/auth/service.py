@@ -17,7 +17,7 @@ class AuthService(object):
 		pass
 	
 	def extract_token(self, request):
-		return request.headers.get(AUTH_HEADER_KEY)
+		return request.headers.get(self.AUTH_HEADER_KEY)
 
 	def make_token(self, user):
 		payload = {

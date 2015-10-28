@@ -63,22 +63,6 @@ class User(db.Model, general.Serializable):
             raise exceptions.ValidationException('Last name must be between 1 and 150 characters', key)
         return value
 
-    @authenticated_request
-    def get_user(self, email):
-        """
-        Returns the requested user
-        """
-
-        message = 'User cannot be authenticated'
-        source = user
-        return utils.make_error(errors.UnauthenticatedRequestError(message, source))
-
-        message = 'User cannot be found'
-        source = user
-        return utils.make_error(errors.MissingUserError(message, source))
-
-    
-
 class UserDao(models.BaseDao):
     """
     Provides access to database operations related to the User object.
