@@ -15,8 +15,9 @@ class ConfigFactory(object):
         variables is/are present, chooses the appropriate configuration
         """
 
-        # TODO: change once hosting environment is known
-        if os.getenv('ON_PRODUCTION') is not None:
+        if os.getenv('OPENSHIFT_APP_NAME'):
+            return _StagingConfig()
+        elif os.getenv('ON_PRODUCTION'):
             return _ProductionConfig()
         return _DevelopmentConfig()
 
