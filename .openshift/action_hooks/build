@@ -1,1 +1,0 @@
-pip install -r ${OPENSHIFT_REPO_DIR}backend/requirements.txt
