@@ -44,7 +44,7 @@ class User(Resource):
         return utils.make_response(data=user.to_dict())
 
     @authenticated_request
-    def get(self, id = None, user = None):
+    def get(self, id = None, requested_user = None):
         """
         Returns the requested user
         """
@@ -52,7 +52,7 @@ class User(Resource):
         user = user_service.find_by_id(id)
 
         if not user:
-            message = 'User cannot be found'
+            message = 'User with ID %s cannot be found' %id
             source = user
             return utils.make_error(errors.NotFoundError(message, source))
 
