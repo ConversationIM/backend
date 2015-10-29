@@ -23,18 +23,18 @@ def initialize():
     _initialize_resources()
     _initialize_socketio()
 
-    socketio.run(app)
+    socketio.run(app, host=config.HOST, port=config.PORT)
 
 def _initialize_logging():
     # TODO: add more specific configuration parameters
     logging.basicConfig(level=config.LOGGING_LEVEL)
-    
+
 def _initialize_resources():
     from app.users import User
     api.add_resource(User, '/users', '/users/<int:id>')
     from app.auth import BasicAuth
     api.add_resource(BasicAuth, '/auth')
-    
+
 def _initialize_socketio():
     from app.sockets import SocketSetupService
     SocketSetupService.setup_handlers(socketio)
