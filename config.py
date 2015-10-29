@@ -77,7 +77,7 @@ class _StagingConfig(_BaseConfig):
         return '{connection}{database}'.format(**mysql_parameters)
 
     HOST = os.getenv('OPENSHIFT_DIY_IP')
-    PORT = os.getenv('OPENSHIFT_DIY_PORT')
+    PORT = int(os.getenv('OPENSHIFT_DIY_PORT', 8080))
     SQLALCHEMY_DATABASE_URI = _build_sql_uri()
     LOGGING_LEVEL = INFO
 
