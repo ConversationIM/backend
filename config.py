@@ -70,12 +70,21 @@ class _StagingConfig(_BaseConfig):
     def _build_sql_uri():
         mysql_parameters = {
             'connection': os.getenv('OPENSHIFT_MYSQL_DB_URL'),
-            'database': 'staging'
+            'database': 'conversationIM'
         }
 
         return '{connection}{database}'.format(**mysql_parameters)
 
+    def _build_app_host():
+        host_parameters = {
+            'host': os.getenv('OPENSHIFT_DIY_IP'),
+            'port': os.getenv('OPENSHIFT_DIY_PORT')
+        }
+
+        return '{host}:{port}'.format(**host_parameters)
+
     SQLALCHEMY_DATABASE_URI = _build_sql_uri()
+    SERVER_NAME = _build_app_host()
     LOGGING_LEVEL = INFO
 
 class _ProductionConfig(_BaseConfig):
