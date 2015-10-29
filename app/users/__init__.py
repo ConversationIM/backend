@@ -2,6 +2,7 @@ from app.common import utils, errors, exceptions
 from app.users.service import UserService
 from flask import request
 from flask_restful import Resource
+from app.auth.decorators import authenticated_request
 
 arguments = {
     'POST': {
@@ -41,3 +42,19 @@ class User(Resource):
             return utils.make_validation_error(e)
         
         return utils.make_response(data=user.to_dict())
+
+    @authenticated_request
+    def get(self, id = None, user = None):
+        """
+        Returns the requested user
+        """
+
+        requested_user = user_service.find_by_id(id)
+
+        if not requested_user:
+            message = 'User with ID %s cannot be found' %id
+            source = requested_user
+            return utils.make_error(errors.NotFoundError(message, source))
+
+        return utils.make_response(data = requested_user.to_dict())
+
