@@ -16,6 +16,7 @@ class ConfigFactory(object):
         """
 
         if os.getenv('OPENSHIFT_APP_NAME'):
+            print("Staging environment detected")
             return _StagingConfig()
         elif os.getenv('ON_PRODUCTION'):
             return _ProductionConfig()
