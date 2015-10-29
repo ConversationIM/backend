@@ -87,7 +87,22 @@ class MissingHeaderError(_BaseError):
         status = 400
         code = 104
 
-        super(InvalidHeaderError, self).__init__(type, message, status, code, source)
+        super(MissingHeaderError, self).__init__(type, message, status, code, source)
+
+class UnauthenticatedRequestError(_BaseError):
+    """
+    An error indicating that the client provided a request
+    that could not be authenticated
+    """
+
+    def __init__(self, message, source):
+        type = 'UnauthenticatedRequestError'
+        if not message:
+            message = 'This resource cannot be accessed with the provided credentials'
+        status = 404
+        code = 106
+
+        super(UnauthenticatedRequestError, self).__init__(type, message, status, code, source)
 
 
 class ApiError(_BaseError):
@@ -104,3 +119,18 @@ class ApiError(_BaseError):
         code = 100
 
         super(ApiError, self).__init__(type, message, status, code, None)
+
+class NotFoundError(_BaseError):
+    """
+    An error indicating that the requested resource could
+    not be found
+    """
+
+    def __init__(self, message, source):
+        type = 'MissingUserError'
+        if not message:
+            message = 'The requested resource could not be found'
+        status = 404
+        code = 105
+
+        super(NotFoundError, self).__init__(type, message, status, code, source)

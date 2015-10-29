@@ -62,7 +62,6 @@ class User(db.Model, general.Serializable):
         if len(value) > 150 or len(value) == 0:
             raise exceptions.ValidationException('Last name must be between 1 and 150 characters', key)
         return value
-    
 
 class UserDao(models.BaseDao):
     """
