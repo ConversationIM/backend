@@ -35,7 +35,7 @@
   		// try to connect to the SocketIO server (namespace MVP)
 	    var socket = io.connect("http://localhost:5000/mvp");
 	    var room = 'default';
-	    var token; // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImV4cCI6MTQ0NjIzOTY4NywiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSJ9.keG6LDBHwlw_Wp7QV1ql4BoDW0I4TSd0uFqaS6TLm3s";
+	    var token;
 	    var payload;
 	    // alert the client of successful connections
         socket.on('connect', function() {
