@@ -33,6 +33,14 @@ class UserService(object):
 
         return self.dao.create(**parameters)
 
+    def find_by_id(self, id):
+        """
+        Finds a user by the provided id by invoking the User DAO
+        :id the id to query with
+        """
+
+        return self.dao.find_by_id(id)
+
     def find_by_email(self, email):
         """
         Finds a user by the provided email by invoking the User DAO
@@ -40,7 +48,7 @@ class UserService(object):
         """
 
         return self.dao.find_by_email(email)
-
+        
     def password_matches(self, user, password):
         """
         Checks to see if the provided user has the provided password
