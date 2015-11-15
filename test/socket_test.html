@@ -30,7 +30,7 @@
   	var tipElement = document.getElementById("tip");
   	var authFormElement = document.getElementById("authForm");
     var messageFormElement = document.getElementById("messageForm");
-    
+
   	try {
   		// try to connect to the SocketIO server (namespace MVP)
 	    var socket = io.connect("http://localhost:5000/mvp");
@@ -40,15 +40,15 @@
 	    // alert the client of successful connections
         socket.on('connect', function() {
         	statusElement.innerHTML = "<p> - Connected to SocketIO namespace 'MVP'</p>";
-        	
+
         	authFormElement.style.display = "";
         	$(authFormElement).submit(function(event) {
         		event.preventDefault();
         		authFormElement.style.display = "none";
-        		
+
         		token = $("#jwt").val();
         		payload = JSON.parse(atob(token.split('.')[1]));
-        		
+
         		// fire off a request to join the default room
 	        	socket.emit('join', JSON.stringify({'token': token, 'room': room}));
 	        });
@@ -61,7 +61,7 @@
         // then set up the textbox immediately after
         socket.on('joined', function(data) {
         	statusElement.innerHTML += "<p> - Joined room '" + data['room'] + "'</p>"
-        	messageFormElement.style.display = ""; 	
+        	messageFormElement.style.display = "";
         });
         // show the user what's going on with the socket on update
         socket.on('updated', function(data) {
@@ -71,24 +71,24 @@
         socket.on('sent', function(data) {
         	statusElement.innerHTML += "<p style='color:green'> - " + data.sender + " sent: " + data.message + "</p>";
         });
-        
+
         // handle when the user types something
         $('#message').on('keyup', function(event) {
         	var val = $(this).val();
         	if (val.trim() === '') return;
         	socket.emit('updated', JSON.stringify({'sender': payload.email, 'room': room, 'message': val}));
         });
-           
+
            // handle when the user sends the message
         $(messageFormElement).submit(function (event) {
              event.preventDefault();
              var val = $('#message').val().trim();
              if (val === "") return false;
              socket.emit('sent', JSON.stringify({'sender': payload.email, 'room': room, 'message': val}));
-             
+
              $('#message').val('');
            })
-            
+
 	} catch (e) {
 		statusElement.innerHTML = e;
 	}

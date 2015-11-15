@@ -9,7 +9,7 @@ def authenticated_request(f):
     Ensures that an incoming request provides a valid
     authentication token
     """
-    
+
     @functools.wraps(f)
     def wrapped(*args, **kwargs):
         auth_service = AuthService()
@@ -18,7 +18,7 @@ def authenticated_request(f):
             message = "This resource cannot be accessed without a valid authentication token"
             source = auth_service.AUTH_HEADER_KEY
             return utils.make_error(errors.UnauthenticatedRequestError(message, source))
-        
+
         payload = None
         try:
             payload = auth_service.validate_token(auth_token)
@@ -26,7 +26,7 @@ def authenticated_request(f):
             message = e.message
             source = auth_service.AUTH_HEADER_KEY
             return utils.make_error(errors.UnauthenticatedRequestError(message, source))
-        
+
         kwargs['user'] = payload
         return f(*args, **kwargs)
     return wrapped
@@ -40,7 +40,7 @@ def authenticated_event(f):
             data = loads(data)
             auth_token = data.get('token')
             kwargs['data'] = data
-            
+
         if not auth_token:
             message = "This resource cannot be accessed without a valid authentication token"
             kwargs['error'] = message
@@ -52,8 +52,6 @@ def authenticated_event(f):
             except exceptions.TokenValidationException, e:
                 message = e.message
                 kwargs['error'] = message
-        
+
         return f(*args, **kwargs)
     return wrapped
-
- 

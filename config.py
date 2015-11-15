@@ -15,8 +15,9 @@ class ConfigFactory(object):
         variables is/are present, chooses the appropriate configuration
         """
 
-        # TODO: change once hosting environment is known
-        if os.getenv('ON_PRODUCTION') is not None:
+        if os.getenv('OPENSHIFT_APP_NAME'):
+            return _StagingConfig()
+        elif os.getenv('ON_PRODUCTION'):
             return _ProductionConfig()
         return _DevelopmentConfig()
 
@@ -40,7 +41,8 @@ class _BaseConfig(object):
 
     DEBUG = False
     TESTING = False
-    BUNDLE_ERRORS = True
+    HOST = 'localhost'
+    PORT = 5000
     SECRET_KEY = os.getenv('CONVERSATIONIM_API_SECRET', 'https://open.spotify.com/track/64i1dyG9Td5z5Q0TCG17Pb')
     LOGGING_LEVEL = NOTSET
     SQLALCHEMY_DATABASE_URI = _build_sql_uri()
@@ -58,6 +60,25 @@ class _DevelopmentConfig(_BaseConfig):
 
     DEBUG = True
     TESTING = True
+    LOGGING_LEVEL = INFO
+
+class _StagingConfig(_BaseConfig):
+    """
+    The configuration keys and their corresponding settings
+    for a staging environment
+    """
+
+    def _build_sql_uri():
+        mysql_parameters = {
+            'connection': os.getenv('OPENSHIFT_MYSQL_DB_URL'),
+            'database': 'conversationIM'
+        }
+
+        return '{connection}{database}'.format(**mysql_parameters)
+
+    HOST = os.getenv('OPENSHIFT_DIY_IP')
+    PORT = int(os.getenv('OPENSHIFT_DIY_PORT', 8080))
+    SQLALCHEMY_DATABASE_URI = _build_sql_uri()
     LOGGING_LEVEL = INFO
 
 class _ProductionConfig(_BaseConfig):
