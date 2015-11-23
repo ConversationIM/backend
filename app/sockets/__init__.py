@@ -1,42 +1,67 @@
 from json import loads
-from flask.ext.socketio import emit, join_room, leave_room
+from flask import request
+from flask_socketio import emit, join_room, leave_room, disconnect
 from app.auth.decorators import authenticated_event
     
 class SocketSetupService(object):
-    """
-    Handles all operations related to socketio handler setup
-    Note: this is to be used in its current state for the MVP
-    ONLY. The functionality has not been throughly tested enough
-    to leave it as-is
-    """
+    
+    sockets = {}
  
     @staticmethod
     def setup_handlers(socketio):
         
-        @socketio.on('join', namespace="/mvp")
+        @socketio.on('initialize', namespace="/global")
         @authenticated_event
-        def handle_join(raw_data, data = None, user = None, error = None):
+        def global_init(raw_data, data=None, user=None, error=None):
             if error:
-                return emit('error', error)
+                emit('error', error)
+                return disconnect()
+            if not user:
+                emit('error', "Authentication is required to initialize this namespace")
+                return disconnect()
             
-            requested_room = data.get('room')
-            if requested_room != 'default':
-                # we will only restrict the room for the MVP
-                error = "Sorry, but only the 'default' room is available"
-                return emit('error', error)
+            sockets[user.email] = { 'global': request.sid }
+            print(sockets)
             
-            join_room(requested_room)
-            emit('joined', {'room': requested_room})
- 
-        @socketio.on('updated', namespace="/mvp")
-        def handle_update(json):
-            data = loads(json)
-            data = {"message": data.get('message'), "sender": data.get("sender")}
-            emit('updated', data, room=data.get("room"), broadcast=True)
+        @socketio.on('initialize', namespace="/conversation")
+        @authenticated_event
+        def conversation_init(raw_data, data=None, user=None, error=None):
+            if error:
+                emit('error', error)
+                return disconnect()
+            if not user:
+                emit('error', "Authentication is required to initialize this namespace")
+                return disconnect()
+            if user.email not in sockets:
+                emit('error', "The global namespace must be initialized before this namespace")
+                return disconnect()
             
-        @socketio.on('sent', namespace="/mvp")
-        def handle_send(json):
-            #violating DRY in order to get the MVP done faster
-            data = loads(json)
-            data = {"message": data.get('message'), "sender": data.get("sender")}
-            emit('sent', data, room=data.get("room"), broadcast=True)
+            sockets[user.email]['conversation'] = request.sid
+        
+#         @socketio.on('join', namespace="/mvp")
+#         @authenticated_event
+#         def handle_join(raw_data, data = None, user = None, error = None):
+#             if error:
+#                 return emit('error', error)
+#             
+#             requested_room = data.get('room')
+#             if requested_room != 'default':
+#                 # we will only restrict the room for the MVP
+#                 error = "Sorry, but only the 'default' room is available"
+#                 return emit('error', error)
+#             
+#             join_room(requested_room)
+#             emit('joined', {'room': requested_room})
+#  
+#         @socketio.on('updated', namespace="/mvp")
+#         def handle_update(json):
+#             data = loads(json)
+#             data = {"message": data.get('message'), "sender": data.get("sender")}
+#             emit('updated', data, room=data.get("room"), broadcast=True)
+#             
+#         @socketio.on('sent', namespace="/mvp")
+#         def handle_send(json):
+#             #violating DRY in order to get the MVP done faster
+#             data = loads(json)
+#             data = {"message": data.get('message'), "sender": data.get("sender")}
+#             emit('sent', data, room=data.get("room"), broadcast=True)

@@ -20,4 +20,14 @@ class TokenValidationException(Exception):
 	"""
 
 	def __init__(self, message):
-		super(TokenValidationException, self).__init__(message)
+		super(TokenValidationException, self).__init__(message)    
+                
+class InvalidOperationException(Exception):
+    """
+    An exception indicating that the
+    requested operation is not possible now,
+    but may be possible later
+    """
+    
+    def __init__(self, message):
+        super(TokenValidationException, self).__init__(message)  
