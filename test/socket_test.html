@@ -22,7 +22,7 @@
     <input id="jwt" placeholder="Authentication Token" autocomplete="off">
     <button>Set Authentication</button>
   </form>
-  <button id="createRoom" style="display:none">Create Room</button>
+  <button id="createConvo" style="display:none">Create Room</button>
   <form id="messageForm" style="display:none">
     <input id="message" autocomplete="off" />
     <button>Send</button>
@@ -36,39 +36,57 @@
     var messageFormElement = document.getElementById("messageForm");
 
     try {
-      // try to connect to the SocketIO server (namespace MVP)
+      // we now have two connections -- one 'global' connection (for app-wide events)
+      // and one 'conversation' connection (for conversation-specific events)
       var global = io.connect("http://localhost:5000/global");
       var conversation = io.connect("http://localhost:5000/conversation");
+      // the user's raw JWT token
       var token;
+      // the payload of the above token
       var payload;
+      // the unique ID for this conversation
+      var conversationId;
 
+      // just add the error to the status element if one comes up
       var errorHandler = function(error) {
         statusElement.innerHTML += "<p style='color:red'> - Error: " + error + "</p>";
       };
 
-      // alert the client of successful connections
+      // try to establish both connections
       global.on('connect', function() {
         conversation.on('connect', function() {
+          // upon success, alert the user
           statusElement.innerHTML = "<p> - Connected to all namespaces.</p>";
+
+          // the ask for his/her JWT token
           authFormElement.style.display = "";
           $(authFormElement).submit(function(event) {
             event.preventDefault();
             authFormElement.style.display = "none";
 
+            // store the token and payload for later
             token = $("#jwt").val();
             payload = JSON.parse(atob(token.split('.')[1]));
 
+            // initialize both connections (global's initialization MUST come first)
+            // or an error will be sent back
             global.emit('initialize', JSON.stringify({
               'token': token
             }), function() {
               conversation.emit('initialize', JSON.stringify({
                 'token': token
               }), function() {
+                // once both are initialized, we're ready to go
+                // so show a button to create a new convo to the user admin@example.com
                 if (payload['email'] === 'admin@example.com') {
-                  // only let the "admin" create rooms
-                  $('#createRoom').show();
-                  $('#createRoom').on('click', function(event) {
+                  $('#createConvo').show();
+                  $('#createConvo').on('click', function(event) {
                     event.preventDefault();
+
+                    // on click, send up a request to the API to create a
+                    // new conversation with the participant test@example.com
+                    // NOTE: if test@example.com is not online, he/she will not be
+                    // added to the conversation!
                     $.ajax({
                       type: "POST",
                       url: "http://localhost:5000/v1/conversation",
@@ -80,8 +98,14 @@
                       beforeSend: function(xhr) {
                         xhr.setRequestHeader('Authorization', token);
                       },
-                      success: function() {
-                        $('#createRoom').hide();
+                      success: function(response) {
+                        // hide the create conversation button on success
+                        $('#createConvo').hide();
+
+                        conversationId = response.data.conversationId;
+                        statusElement.innerHTML = "<p>You're now chatting with " + response.data.participants + ".</p>";
+
+                        messageFormElement.style.display = "";
                       },
                       error: function(error) {
                         console.log("There was an error: ", error);
@@ -89,6 +113,9 @@
                     });
                   });
                 } else {
+                  // if the user isn't the specific user that we're allowing to start conversations,
+                  // just show a 'waiting' message
+                  // NOTE: any user can create conversations in the real app!
                   $(statusElement).append("<p>- Waiting for incoming conversations</p>");
                 }
               });
@@ -101,18 +128,19 @@
       global.on('error', errorHandler);
       conversation.on('error', errorHandler);
 
-      // alert the client when a room has been joined successfully
-      // then set up the textbox immediately after
-      /*socket.on('joined', function(data) {
-      	statusElement.innerHTML += "<p> - Joined room '" + data['room'] + "'</p>"
-      	messageFormElement.style.display = "";
+      // let the user know that he/she has been added to a conversation
+      global.on('added', function(data) {
+        conversationId = data.conversationId;
+        statusElement.innerHTML = "<p>Added to conversation by " + data.creator + ".</p>";
+        messageFormElement.style.display = "";
       });
-      // show the user what's going on with the socket on update
-      socket.on('updated', function(data) {
+
+      // show the user what's going on with the conversation on update
+      conversation.on('updated', function(data) {
       	statusElement.innerHTML += "<p> - " + data.sender + " is typing: " + data.message + "</p>";
       });
       // show the user when a message was sent (finalized)
-      socket.on('sent', function(data) {
+      conversation.on('sent', function(data) {
       	statusElement.innerHTML += "<p style='color:green'> - " + data.sender + " sent: " + data.message + "</p>";
       });
 
@@ -120,7 +148,7 @@
       $('#message').on('keyup', function(event) {
       	var val = $(this).val();
       	if (val.trim() === '') return;
-      	socket.emit('updated', JSON.stringify({'sender': payload.email, 'room': room, 'message': val}));
+      	conversation.emit('updated', JSON.stringify({'sender': payload.email, 'conversationId': conversationId, 'message': val}));
       });
 
          // handle when the user sends the message
@@ -128,11 +156,10 @@
            event.preventDefault();
            var val = $('#message').val().trim();
            if (val === "") return false;
-           socket.emit('sent', JSON.stringify({'sender': payload.email, 'room': room, 'message': val}));
+           conversation.emit('sent', JSON.stringify({'sender': payload.email, 'conversationId': conversationId, 'message': val}));
 
            $('#message').val('');
-         })
-         */
+         });
     } catch (e) {
       statusElement.innerHTML = e;
     }

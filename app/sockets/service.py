@@ -10,9 +10,14 @@ class SocketService(object):
     _sockets = {}
     
     @staticmethod
-    def _enter_room(socket_id, conversation_id, participant):
+    def _enter_conversation(socket_id, conversation_id, participant):
         socketio = current_app.extensions['socketio']
-        socketio.server.enter_room(socket_id, conversation_id, namespace='conversation')
+        socketio.server.enter_room(socket_id, conversation_id, namespace='/conversation')
+        
+    @staticmethod
+    def _get_conversations(socket_id, participant):
+        socketio = current_app.extensions['socketio']
+        socketio.server.rooms(socket_id, namespace='/conversation')
     
     @staticmethod
     def add_global_identifier(email, socket_identifier):
@@ -26,16 +31,18 @@ class SocketService(object):
         
     @staticmethod
     def create_conversation(conversation_id, creator, participants):
-        result = [creator]
-        SocketService._enter_room(SocketService._sockets[creator]['conversation'], conversation_id, creator)
+        result = []
+        SocketService._enter_conversation(SocketService._sockets[creator]['conversation'], conversation_id, creator)
         
         for participant in participants:
             if participant in SocketService._sockets:
                 global_socket_id = SocketService._sockets[participant]['global']
                 conversation_socket_id = SocketService._sockets[participant]['conversation']
                 
-                SocketService._enter_room(conversation_socket_id, conversation_id, participant)
-                emit('added', namespace='global', room=global_socket_id)
+                request.namespace = '/global'
+                request.sid = global_socket_id
+                SocketService._enter_conversation(conversation_socket_id, conversation_id, participant)
+                emit('added', {'conversationId': conversation_id, 'creator': creator})
                 
                 result.append(participant)
                 
@@ -68,30 +75,17 @@ class SocketSetupService(object):
             except InvalidOperationException, e:
                 emit('error', e.message)
         
-#         @socketio.on('join', namespace="/mvp")
-#         @authenticated_event
-#         def handle_join(raw_data, data = None, user = None, error = None):
-#             if error:
-#                 return emit('error', error)
-#             
-#             requested_room = data.get('room')
-#             if requested_room != 'default':
-#                 # we will only restrict the room for the MVP
-#                 error = "Sorry, but only the 'default' room is available"
-#                 return emit('error', error)
-#             
-#             join_room(requested_room)
-#             emit('joined', {'room': requested_room})
-#  
-#         @socketio.on('updated', namespace="/mvp")
-#         def handle_update(json):
-#             data = loads(json)
-#             data = {"message": data.get('message'), "sender": data.get("sender")}
-#             emit('updated', data, room=data.get("room"), broadcast=True)
-#             
-#         @socketio.on('sent', namespace="/mvp")
-#         def handle_send(json):
-#             #violating DRY in order to get the MVP done faster
-#             data = loads(json)
-#             data = {"message": data.get('message'), "sender": data.get("sender")}
-#             emit('sent', data, room=data.get("room"), broadcast=True)
+  
+        @socketio.on('updated', namespace="/conversation")
+        def conversation_update(json):
+            if type(json) is not dict:
+                data = loads(json)
+            
+            emit('updated', data, room=data.get('conversationId'))
+             
+        @socketio.on('sent', namespace="/conversation")
+        def conversation_send(json):
+            if type(json) is not dict:
+                data = loads(json)
+
+            emit('sent', data, room=data.get("conversationId"))

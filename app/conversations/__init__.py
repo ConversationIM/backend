@@ -24,7 +24,7 @@ class Conversation(Resource):
 
         args = marshalled[0]
         participants = args['participants']
-        conversation_id = ''.join(random.choice(string.lowercase) for i in range(20))
+        conversation_id = ''.join(random.choice(string.lowercase) for i in range(25))
         
         result = SocketService.create_conversation(conversation_id, user['email'], participants)
         return utils.make_response(data = { 'conversationId': conversation_id, 'participants': result })
