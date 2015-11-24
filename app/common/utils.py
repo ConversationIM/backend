@@ -92,7 +92,7 @@ def marshal_request(arguments, expected):
     :expected the dictionary containing the allowed and required parameters
     """
 
-    arguments = byteify(json.loads(arguments))
+    arguments = byteify(json.loads(arguments)) if arguments else {}
     required = expected.get('required', [])
     allowed = expected.get('allowed', [])
 

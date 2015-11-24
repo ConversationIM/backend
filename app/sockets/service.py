@@ -2,7 +2,7 @@ from json import loads
 from flask import request, current_app
 from flask_socketio import emit, join_room, leave_room
 from app.auth.decorators import authenticated_event
-from app.common.errors import InvalidOperationException
+from app.common.exceptions import InvalidOperationException
 from test.test_socket import _socket
 
 class SocketService(object):
@@ -11,28 +11,28 @@ class SocketService(object):
     
     @staticmethod
     def _enter_room(socket_id, conversation_id, participant):
-        socketio = flask.current_app.extensions['socketio']
-        socketio.server.enter_room(socket_id, conversation_id, namespace=flask.request.namespace)
+        socketio = current_app.extensions['socketio']
+        socketio.server.enter_room(socket_id, conversation_id, namespace='conversation')
     
     @staticmethod
     def add_global_identifier(email, socket_identifier):
-        _sockets[email] = { 'global': socket_identifier }
+        SocketService._sockets[email] = { 'global': socket_identifier }
     
     @staticmethod
     def add_conversation_identifier(email, socket_identifier):
-        if email not in sockets:
+        if email not in SocketService._sockets:
             raise InvalidOperationException("The global namespace must be initialized before this namespace")
-        _sockets[email]['conversation'] = socket_identifier
+        SocketService._sockets[email]['conversation'] = socket_identifier
         
     @staticmethod
     def create_conversation(conversation_id, creator, participants):
         result = [creator]
-        SocketService._enter_room(flask.request.sid, conversation_id, creator)
+        SocketService._enter_room(SocketService._sockets[creator]['conversation'], conversation_id, creator)
         
         for participant in participants:
-            if participant in _sockets:
-                global_socket_id = _sockets[participant]['global']
-                conversation_socket_id = _sockets[participant]['conversation']
+            if participant in SocketService._sockets:
+                global_socket_id = SocketService._sockets[participant]['global']
+                conversation_socket_id = SocketService._sockets[participant]['conversation']
                 
                 SocketService._enter_room(conversation_socket_id, conversation_id, participant)
                 emit('added', namespace='global', room=global_socket_id)
@@ -54,7 +54,7 @@ class SocketSetupService(object):
             if error:
                 emit('error', error)
                 
-            SocketService.add_global_identifier(user.email, request.sid)
+            SocketService.add_global_identifier(user['email'], request.sid)
             
         @socketio.on('initialize', namespace="/conversation")
         @authenticated_event
@@ -64,7 +64,7 @@ class SocketSetupService(object):
             if error:
                 emit('error', error)
             try:
-                SocketService.add_conversation_identifier(user.email, request.sid)
+                SocketService.add_conversation_identifier(user['email'], request.sid)
             except InvalidOperationException, e:
                 emit('error', e.message)
         
