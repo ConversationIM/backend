@@ -15,6 +15,10 @@ class Conversation(Resource):
 
     @authenticated_request
     def post(self, user=None):
+        """
+        Creates a new conversation
+        """
+        
         args = request.data
         marshalled = utils.marshal_request(args, arguments['POST'])
 

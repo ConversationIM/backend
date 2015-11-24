@@ -1,3 +1,12 @@
+<!-- WARNING: this is a crude integration test meant to quickly test functionality. 
+
+As such, It will not work in most modern browsers without disabling certain security features
+(this is a good thing). The reason for this is related to the fact that this test will attempt to make
+a cross-origin request to a local API server. Since this is a potentially bad thing, browsers stop it.
+
+Nevertheless if you are using Chrome and would like to see the results of this test, you can use the
+'disable-web-security' option to do so.-->
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -137,29 +146,37 @@
 
       // show the user what's going on with the conversation on update
       conversation.on('updated', function(data) {
-      	statusElement.innerHTML += "<p> - " + data.sender + " is typing: " + data.message + "</p>";
+        statusElement.innerHTML += "<p> - " + data.sender + " is typing: " + data.message + "</p>";
       });
       // show the user when a message was sent (finalized)
       conversation.on('sent', function(data) {
-      	statusElement.innerHTML += "<p style='color:green'> - " + data.sender + " sent: " + data.message + "</p>";
+        statusElement.innerHTML += "<p style='color:green'> - " + data.sender + " sent: " + data.message + "</p>";
       });
 
       // handle when the user types something
       $('#message').on('keyup', function(event) {
-      	var val = $(this).val();
-      	if (val.trim() === '') return;
-      	conversation.emit('updated', JSON.stringify({'sender': payload.email, 'conversationId': conversationId, 'message': val}));
+        var val = $(this).val();
+        if (val.trim() === '') return;
+        conversation.emit('updated', JSON.stringify({
+          'sender': payload.email,
+          'conversationId': conversationId,
+          'message': val
+        }));
       });
 
-         // handle when the user sends the message
-      $(messageFormElement).submit(function (event) {
-           event.preventDefault();
-           var val = $('#message').val().trim();
-           if (val === "") return false;
-           conversation.emit('sent', JSON.stringify({'sender': payload.email, 'conversationId': conversationId, 'message': val}));
+      // handle when the user sends the message
+      $(messageFormElement).submit(function(event) {
+        event.preventDefault();
+        var val = $('#message').val().trim();
+        if (val === "") return false;
+        conversation.emit('sent', JSON.stringify({
+          'sender': payload.email,
+          'conversationId': conversationId,
+          'message': val
+        }));
 
-           $('#message').val('');
-         });
+        $('#message').val('');
+      });
     } catch (e) {
       statusElement.innerHTML = e;
     }
