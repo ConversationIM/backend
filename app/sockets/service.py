@@ -101,7 +101,33 @@ class SocketService(object):
                 result.append(participant)
                 
         return result
+
+    @staticmethod
+    def remove_global_identifier(email):
+        """
+        Removes the provided email from the internal mapping
+        of users to socket IDs
+        
+        :email        the email address of a user
+        """
+        
+        if email in SocketService._sockets:
+            del SocketService._sockets[email]
     
+    @staticmethod
+    def _leave_conversation(socket_id, conversation_id, participant):
+        """
+        Removes a participant from a conversation
+        
+        :socket_id        the 'conversation' socket ID for the participant
+        :conversation_id  a unique ID for a specific conversation
+        :participant      the email address of the participant
+        """
+        
+        socketio = current_app.extensions['socketio']
+        socketio.server.leave_room(socket_id, conversation_id, namespace='/conversation')
+        
+
 class SocketSetupService(object):
  
     @staticmethod
