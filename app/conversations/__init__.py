@@ -32,3 +32,10 @@ class Conversation(Resource):
         
         result = SocketService.create_conversation(conversation_id, user['email'], participants)
         return utils.make_response(data = { 'conversationId': conversation_id, 'participants': result })
+
+    def remove(self, user=None):
+        """
+        Removes the user from the conversation
+        """
+
+        

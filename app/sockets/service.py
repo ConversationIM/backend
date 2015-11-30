@@ -123,14 +123,16 @@ class SocketService(object):
         :conversation_id  a unique ID for a specific conversation
         :participant      the email address of the participant
         """
-        
-        socketio = current_app.extensions['socketio']
-        socketio.server.leave_room(socket_id, conversation_id, namespace='/conversation')
+        if socket_id in SocketService._sockets.values():
+            socketio = current_app.extensions['socketio']
+            socketio.server.leave_room(socket_id, conversation_id, namespace='/conversation')
 
     @staticmethod
     def close_room(conversation_id):
         """
         Removes any users in the given room and deletes room from server
+
+        :conversation_id  a unique ID for a specific conversation
         """
 
         socketio = current_app.extensions['socketio']
@@ -163,7 +165,26 @@ class SocketSetupService(object):
                 SocketService.add_conversation_identifier(user['email'], request.sid)
             except InvalidOperationException, e:
                 emit('error', e.message)
-        
+
+        @socketio.on('disconnect', namespace="/global")
+        @authenticated_event
+        def global_disconnect(raw_data, data=None, user=None, error=None):
+            if not user:
+                emit('error', "Authentication is required to disconnect this namespace")
+            if error:
+                emit('error', error)
+                
+            SocketService.remove_identifier(user['email'])
+
+        @socketio.on('disconnect', namespace="/conversation")
+        @authenticated_event
+        def conversation_disconnect(raw_data, data=None, user=None, error=None):
+            if not user:
+                emit('error', "Authentication is required to disconnect this namespace")
+            if error:
+                emit('error', error)
+
+            SocketService.leave_conversation(request.sid, request.namespace, user['email'])
   
         @socketio.on('updated', namespace="/conversation")
         def conversation_update(json):
