@@ -103,7 +103,7 @@ class SocketService(object):
         return result
 
     @staticmethod
-    def remove_global_identifier(email):
+    def remove_identifier(email):
         """
         Removes the provided email from the internal mapping
         of users to socket IDs
@@ -113,9 +113,9 @@ class SocketService(object):
         
         if email in SocketService._sockets:
             del SocketService._sockets[email]
-    
+
     @staticmethod
-    def _leave_conversation(socket_id, conversation_id, participant):
+    def leave_conversation(socket_id, conversation_id, participant):
         """
         Removes a participant from a conversation
         
@@ -126,6 +126,15 @@ class SocketService(object):
         
         socketio = current_app.extensions['socketio']
         socketio.server.leave_room(socket_id, conversation_id, namespace='/conversation')
+
+    @staticmethod
+    def close_room(conversation_id):
+        """
+        Removes any users in the given room and deletes room from server
+        """
+
+        socketio = current_app.extensions['socketio']
+        socketio.server.close_room(conversation_id, namespace = '/conversation')
         
 
 class SocketSetupService(object):
