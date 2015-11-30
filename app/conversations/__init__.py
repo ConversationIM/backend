@@ -37,5 +37,5 @@ class Conversation(Resource):
         """
         Removes the user from the conversation
         """
-
         
+        SocketService.leave_conversation(request.sid, request.namespace, user['email'])
