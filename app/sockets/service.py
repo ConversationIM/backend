@@ -16,17 +16,20 @@ class SocketService(object):
     _sockets = {}
     
     @staticmethod
-    def _enter_conversation(socket_id, conversation_id, participant):
+    def enter_conversation(conversation_id, participant):
         """
         Adds a participant to a conversation,
         creating a new one if one with the given
         conversation_id does not already exist
         
-        :socket_id        the 'conversation' socket ID for the participant
         :conversation_id  a unique ID for a specific conversation
         :participant      the email address of the participant
         """
         
+        if not participant in SocketService._sockets:
+            return
+
+        socket_id = SocketService._sockets[participant]['conversation']
         socketio = current_app.extensions['socketio']
         socketio.server.enter_room(socket_id, conversation_id, namespace='/conversation')
         
@@ -83,7 +86,7 @@ class SocketService(object):
         """
         
         result = []
-        SocketService._enter_conversation(SocketService._sockets[creator]['conversation'], conversation_id, creator)
+        SocketService.enter_conversation(conversation_id, creator)
         
         for participant in participants:
             if participant in SocketService._sockets:
@@ -101,7 +104,46 @@ class SocketService(object):
                 result.append(participant)
                 
         return result
-    
+
+    @staticmethod
+    def remove_identifier(email):
+        """
+        Removes the provided email from the internal mapping
+        of users to socket IDs
+        
+        :email        the email address of a user
+        """
+        
+        if email in SocketService._sockets:
+            del SocketService._sockets[email]
+
+    @staticmethod
+    def leave_conversation(conversation_id, participant):
+        """
+        Removes a participant from a conversation
+        
+        :conversation_id  a unique ID for a specific conversation
+        :participant      the email address of the participant
+        """
+        if not participant in SocketService._sockets:
+            return
+
+        socket_id = SocketService._sockets[participant]['conversation']
+        socketio = current_app.extensions['socketio']
+        socketio.server.leave_room(socket_id, conversation_id, namespace='/conversation')
+
+    @staticmethod
+    def close_room(conversation_id):
+        """
+        Removes any users in the given room and deletes room from server
+
+        :conversation_id  a unique ID for a specific conversation
+        """
+
+        socketio = current_app.extensions['socketio']
+        socketio.server.close_room(conversation_id, namespace = '/conversation')
+        
+
 class SocketSetupService(object):
  
     @staticmethod
@@ -128,8 +170,17 @@ class SocketSetupService(object):
                 SocketService.add_conversation_identifier(user['email'], request.sid)
             except InvalidOperationException, e:
                 emit('error', e.message)
-        
-  
+
+        @socketio.on('disconnect', namespace="/global")
+        @authenticated_event
+        def global_disconnect(raw_data, data=None, user=None, error=None):
+            if not user:
+                emit('error', "Authentication is required to disconnect this namespace")
+            if error:
+                emit('error', error)
+                
+            SocketService.remove_identifier(user['email'])
+
         @socketio.on('updated', namespace="/conversation")
         def conversation_update(json):
             if type(json) is not dict:

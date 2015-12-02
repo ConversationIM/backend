@@ -8,6 +8,8 @@ from flask_restful import Resource
 arguments = {
     'POST': {
         'required' : ['participants']
+    } ,
+    'PUT': {'allowed' : ['add', 'remove']
     }
 }
 
@@ -32,3 +34,28 @@ class Conversation(Resource):
         
         result = SocketService.create_conversation(conversation_id, user['email'], participants)
         return utils.make_response(data = { 'conversationId': conversation_id, 'participants': result })
+
+    @authenticated_request
+    def put(self, id=None, user=None):
+        """
+        Removes the user from the conversation
+        """
+        args = request.data
+        marshalled = utils.marshal_request(args, arguments['PUT'])
+
+        marshal_error = utils.make_marshal_error(marshalled)
+        if marshal_error:
+            return marshal_error
+
+        args = marshalled[0]
+        add = args.get('add')
+        remove = args.get('remove')
+
+        if add:
+            for addition in add:
+                SocketService.enter_conversation(id, addition)
+        if remove:
+            for removal in remove:
+                SocketService.leave_conversation(id, removal)
+
+        return utils.make_response(data = {})
