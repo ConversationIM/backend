@@ -86,7 +86,7 @@ class SocketService(object):
         """
         
         result = []
-        SocketService._enter_conversation(SocketService._sockets[creator]['conversation'], conversation_id, creator)
+        SocketService.enter_conversation(conversation_id, creator)
         
         for participant in participants:
             if participant in SocketService._sockets:

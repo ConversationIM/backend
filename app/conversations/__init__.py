@@ -47,4 +47,15 @@ class Conversation(Resource):
         if marshal_error:
             return marshal_error
 
-        SocketService.leave_conversation(id, user['email'])
+        args = marshalled[0]
+        add = args.get('add')
+        remove = args.get('remove')
+
+        if add:
+            for addition in add:
+                SocketService.enter_conversation(id, addition)
+        if remove:
+            for removal in remove:
+                SocketService.leave_conversation(id, removal)
+
+        return utils.make_response(data = {})
