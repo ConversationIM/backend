@@ -34,7 +34,9 @@ def _initialize_resources():
     api.add_resource(User, '/users', '/users/<int:id>')
     from app.auth import BasicAuth
     api.add_resource(BasicAuth, '/auth')
+    from app.conversations import Conversation
+    api.add_resource(Conversation, '/conversation', '/conversation/<string:id>')
 
 def _initialize_socketio():
-    from app.sockets import SocketSetupService
+    from app.sockets.service import SocketSetupService
     SocketSetupService.setup_handlers(socketio)
