@@ -32,6 +32,13 @@ def _initialize_logging():
         from app.common.errors import ApiError
         from app.common.utils import make_error
 
+        handler = RotatingFileHandler(config.LOG_LOCATION, maxBytes=10000, backupCount=1)
+        formatter = logging.Formatter("[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s")
+
+        handler.setLevel(config.LOGGING_LEVEL)
+        handler.setFormatter(formatter)
+        app.logger.addHandler(handler)
+
         @app.errorhandler(500)
         def internal_server_error(error):
             app.logger.error('Server Error: %s', (error))
@@ -41,10 +48,6 @@ def _initialize_logging():
         def unhandled_exception(e):
             app.logger.error('Unhandled Exception: %s', (e))
             return make_error(ApiError())
-
-        handler = RotatingFileHandler(config.LOG_LOCATION, maxBytes=10000, backupCount=1)
-        handler.setLevel(config.LOGGING_LEVEL)
-        app.logger.addHandler(handler)
     else:
         logging.basicConfig(level=config.LOGGING_LEVEL)
 
