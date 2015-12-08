@@ -3,6 +3,8 @@ from logging import NOTSET, DEBUG, WARN, INFO, ERROR, CRITICAL
 
 __all__ = ['ConfigFactory']
 
+LOG_FILENAME = "api.log"
+
 class ConfigFactory(object):
     """
     Generates the configuration for the current environment
@@ -41,9 +43,11 @@ class _BaseConfig(object):
 
     DEBUG = False
     TESTING = False
+    PROPAGATE_EXCEPTIONS = True
     HOST = 'localhost'
     PORT = 5000
     SECRET_KEY = os.getenv('CONVERSATIONIM_API_SECRET', 'https://open.spotify.com/track/64i1dyG9Td5z5Q0TCG17Pb')
+    LOG_LOCATION = None
     LOGGING_LEVEL = NOTSET
     SQLALCHEMY_DATABASE_URI = _build_sql_uri()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -76,9 +80,18 @@ class _StagingConfig(_BaseConfig):
 
         return '{connection}{database}'.format(**mysql_parameters)
 
+    def _build_log_location():
+        log_parameters = {
+            'directory': os.getenv('OPENSHIFT_LOG_DIR'),
+            'filename': LOG_FILENAME
+        }
+
+        return '{directory}{filename}'.format(**log_parameters)
+
     HOST = os.getenv('OPENSHIFT_DIY_IP')
     PORT = int(os.getenv('OPENSHIFT_DIY_PORT', 8080))
     SQLALCHEMY_DATABASE_URI = _build_sql_uri()
+    LOG_LOCATION = _build_log_location()
     LOGGING_LEVEL = INFO
 
 class _ProductionConfig(_BaseConfig):

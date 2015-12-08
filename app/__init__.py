@@ -1,6 +1,8 @@
 import logging
 import traceback
 
+from logging.handlers import RotatingFileHandler
+
 from flask import Flask
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
@@ -26,8 +28,25 @@ def initialize():
     socketio.run(app, host=config.HOST, port=config.PORT)
 
 def _initialize_logging():
-    # TODO: add more specific configuration parameters
-    logging.basicConfig(level=config.LOGGING_LEVEL)
+    if config.LOG_LOCATION:
+        from app.common.errors import ApiError
+        from app.common.utils import make_error
+
+        @app.errorhandler(500)
+        def internal_server_error(error):
+            app.logger.error('Server Error: %s', (error))
+            return make_error(ApiError())
+
+        @app.errorhandler(Exception)
+        def unhandled_exception(e):
+            app.logger.error('Unhandled Exception: %s', (e))
+            return make_error(ApiError())
+
+        handler = RotatingFileHandler(config.LOG_LOCATION, maxBytes=10000, backupCount=1)
+        handler.setLevel(config.LOGGING_LEVEL)
+        app.logger.addHandler(handler)
+    else:
+        logging.basicConfig(level=config.LOGGING_LEVEL)
 
 def _initialize_resources():
     from app.users import User

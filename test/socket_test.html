@@ -47,8 +47,8 @@ Nevertheless if you are using Chrome and would like to see the results of this t
     try {
       // we now have two connections -- one 'global' connection (for app-wide events)
       // and one 'conversation' connection (for conversation-specific events)
-      var global = io.connect("http://localhost:5000/global");
-      var conversation = io.connect("http://localhost:5000/conversation");
+      var global = io.connect("http://staging-magerko2.rhcloud.com/global");
+      var conversation = io.connect("http://staging-magerko2.rhcloud.com/conversation");
       // the user's raw JWT token
       var token;
       // the payload of the above token
@@ -94,7 +94,7 @@ Nevertheless if you are using Chrome and would like to see the results of this t
                   // added to the conversation!
                   $.ajax({
                     type: "POST",
-                    url: "http://localhost:5000/v1/conversation",
+                    url: "http://staging-magerko2.rhcloud.com/v1/conversation",
                     data: JSON.stringify({
                       "participants": ["test@example.com"]
                     }),
