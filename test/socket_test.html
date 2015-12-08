@@ -1,4 +1,4 @@
-<!-- WARNING: this is a crude integration test meant to quickly test functionality. 
+<!-- WARNING: this is a crude integration test meant to quickly test functionality.
 
 As such, It will not work in most modern browsers without disabling certain security features
 (this is a good thing). The reason for this is related to the fact that this test will attempt to make
@@ -77,57 +77,52 @@ Nevertheless if you are using Chrome and would like to see the results of this t
             token = $("#jwt").val();
             payload = JSON.parse(atob(token.split('.')[1]));
 
-            // initialize both connections (global's initialization MUST come first)
-            // or an error will be sent back
+            // initialize connection
             global.emit('initialize', JSON.stringify({
               'token': token
             }), function() {
-              conversation.emit('initialize', JSON.stringify({
-                'token': token
-              }), function() {
-                // once both are initialized, we're ready to go
-                // so show a button to create a new convo to the user admin@example.com
-                if (payload['email'] === 'admin@example.com') {
-                  $('#createConvo').show();
-                  $('#createConvo').on('click', function(event) {
-                    event.preventDefault();
+              // once initialized, we're ready to go
+              // so show a button to create a new convo to the user admin@example.com
+              if (payload['email'] === 'admin@example.com') {
+                $('#createConvo').show();
+                $('#createConvo').on('click', function(event) {
+                  event.preventDefault();
 
-                    // on click, send up a request to the API to create a
-                    // new conversation with the participant test@example.com
-                    // NOTE: if test@example.com is not online, he/she will not be
-                    // added to the conversation!
-                    $.ajax({
-                      type: "POST",
-                      url: "http://localhost:5000/v1/conversation",
-                      data: JSON.stringify({
-                        "participants": ["test@example.com"]
-                      }),
-                      contentType: 'application/json; charset=utf-8',
-                      dataType: 'json',
-                      beforeSend: function(xhr) {
-                        xhr.setRequestHeader('Authorization', token);
-                      },
-                      success: function(response) {
-                        // hide the create conversation button on success
-                        $('#createConvo').hide();
+                  // on click, send up a request to the API to create a
+                  // new conversation with the participant test@example.com
+                  // NOTE: if test@example.com is not online, he/she will not be
+                  // added to the conversation!
+                  $.ajax({
+                    type: "POST",
+                    url: "http://localhost:5000/v1/conversation",
+                    data: JSON.stringify({
+                      "participants": ["test@example.com"]
+                    }),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    beforeSend: function(xhr) {
+                      xhr.setRequestHeader('Authorization', token);
+                    },
+                    success: function(response) {
+                      // hide the create conversation button on success
+                      $('#createConvo').hide();
 
-                        conversationId = response.data.conversationId;
-                        statusElement.innerHTML = "<p>You're now chatting with " + response.data.participants + ".</p>";
+                      conversationId = response.data.conversationId;
+                      statusElement.innerHTML = "<p>You're now chatting with " + response.data.participants + ".</p>";
 
-                        messageFormElement.style.display = "";
-                      },
-                      error: function(error) {
-                        console.log("There was an error: ", error);
-                      }
-                    });
+                      messageFormElement.style.display = "";
+                    },
+                    error: function(error) {
+                      console.log("There was an error: ", error);
+                    }
                   });
-                } else {
-                  // if the user isn't the specific user that we're allowing to start conversations,
-                  // just show a 'waiting' message
-                  // NOTE: any user can create conversations in the real app!
-                  $(statusElement).append("<p>- Waiting for incoming conversations</p>");
-                }
-              });
+                });
+              } else {
+                // if the user isn't the specific user that we're allowing to start conversations,
+                // just show a 'waiting' message
+                // NOTE: any user can create conversations in the real app!
+                $(statusElement).append("<p>- Waiting for incoming conversations</p>");
+              }
             });
           });
         });
@@ -175,6 +170,7 @@ Nevertheless if you are using Chrome and would like to see the results of this t
           'message': val
         }));
 
+        statusElement.innerHTML += "<p style='color:green'> - " + payload.email + " sent: " + val + "</p>";
         $('#message').val('');
       });
     } catch (e) {
